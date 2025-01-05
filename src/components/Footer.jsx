@@ -25,7 +25,7 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-semibold mb-4">{t('contact_info')}</h4>
             <ul className="space-y-2 text-gray-300">
-              <li>123 Football Street</li>
+              <li>Rustaveli Street 10</li>
               <li>Tbilisi, Georgia</li>
               <li>Phone: +995 555 123 456</li>
               <li>Email: info@ansa.ge</li>
