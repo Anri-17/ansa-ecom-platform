@@ -1,34 +1,62 @@
-import React, { useState } from 'react'
-import { useAuth } from '../context/AuthContext'
-import { useLanguage } from '../context/LanguageContext'
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function AccountPage() {
-  const { t } = useLanguage()
-  const { user, signIn, signUp, signOut } = useAuth()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isSignUp, setIsSignUp] = useState(false)
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const { t } = useLanguage();
+  const { user, signIn, signUp, signOut, loading, error: authError } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState(null); // Local error state for form validation
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Redirect to home if already logged in
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+    e.preventDefault();
+    setError(null); // Clear previous errors
 
     try {
       if (isSignUp) {
-        await signUp(email, password)
+        if (!email || !password) {
+          throw new Error(t('all_fields_required'));
+        }
+        const result = await signUp(email, password);
+        if (result.error) {
+          throw result.error;
+        }
       } else {
-        await signIn(email, password)
+        if (!email || !password) {
+          throw new Error(t('all_fields_required'));
+        }
+        const result = await signIn(email, password);
+        if (result.error) {
+          throw result.error;
+        }
       }
+      navigate('/'); // Redirect to home after successful login/signup
     } catch (err) {
-      setError(err.message)
+      if (err.message === 'Credentials incorrect') {
+        setError(t('incorrect_credentials'));
+      } else if (err.message === 'all_fields_required') {
+        setError(t('all_fields_required'));
+      } else {
+        setError(t('generic_error')); // Generic error message for other issues
+        console.error("Authentication error:", err);
+      }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
+  // Display appropriate content based on login status
   if (user) {
     return (
       <div className="container mx-auto p-4">
@@ -48,17 +76,14 @@ export default function AccountPage() {
                   className="input-field bg-gray-100 text-black"
                 />
               </div>
-              <button
-                onClick={() => signOut()}
-                className="btn-outline-black w-full"
-              >
+              <button onClick={signOut} className="btn-outline-black w-full">
                 {t('sign_out')}
               </button>
             </div>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -118,5 +143,5 @@ export default function AccountPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
