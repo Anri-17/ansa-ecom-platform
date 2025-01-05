@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext'
 
 export default function AccountPage() {
   const { t } = useLanguage()
-  const { user, signIn, signUp } = useAuth()
+  const { user, signIn, signUp, signOut } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSignUp, setIsSignUp] = useState(false)
@@ -45,7 +45,7 @@ export default function AccountPage() {
                   type="email"
                   value={user.email}
                   disabled
-                  className="input-field bg-gray-100"
+                  className="input-field bg-gray-100 text-black"
                 />
               </div>
               <button
@@ -83,7 +83,7 @@ export default function AccountPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input-field"
+                className="input-field text-black"
                 required
               />
             </div>
@@ -95,7 +95,7 @@ export default function AccountPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input-field"
+                className="input-field text-black"
                 required
               />
             </div>
